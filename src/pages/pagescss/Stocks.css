@@ -1,0 +1,165 @@
+.app-container {
+    display: flex;
+}
+
+.page-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+h1 {
+    color: #333;
+    font-size: 24px;
+    text-align: center;
+}
+
+.search-bar {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    margin: 20px 0;
+    border: 1px solid #ffa500;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #333;
+}
+
+.add-stock-button {
+    width: 420px;
+    background-color: #ffa500;
+    color: #333;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+    .add-stock-button:hover {
+        background-color: #ff8c00;
+    }
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+    .modal-content h2 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .modal-content label {
+        display: block;
+        margin-top: 10px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .modal-content input,
+    .modal-content select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .modal-content button {
+        background-color: #ffa500;
+        color: #333;
+        padding: 10px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+        .modal-content button:hover {
+            background-color: #ff8c00;
+        }
+
+table {
+    width: 100%;
+    max-width: 1100px;
+    border-collapse: collapse;
+    margin-top: 18px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+    table thead {
+        background-color: #ffa500;
+    }
+
+    table th,
+    table td {
+        padding: 12px;
+        text-align: left;
+        color: #333;
+    }
+
+    table th {
+        font-size: 16px;
+        white-space: nowrap;
+    }
+
+    table td {
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    table tbody tr:hover {
+        background-color: #ffe5b4;
+    }
+
+    table button {
+        background-color: #ffa500;
+        color: #333;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+        table button:hover {
+            background-color: #ff8c00;
+        }
+
+.delete-button,
+.edit-button {
+    background-color: transparent;
+    border: none;
+    color: #333;
+    cursor: pointer;
+}
+
+    .delete-button:hover,
+    .edit-button:hover {
+        color: #333;
+    }
