@@ -15,7 +15,7 @@ const LoginPage = () => {
 
         try {
             await auth.signInWithEmailAndPassword(email, password);
-            navigate('/dashboard');
+            navigate('/Sales');
         } catch (error) {
             if (!navigator.onLine) {
                 setError('No internet connection. Please Try Again.')

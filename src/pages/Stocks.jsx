@@ -82,6 +82,8 @@ const Stocks = () => {
 
         if (window.confirm("Do you want to save changes to this stock?")) {
             const stockDoc = doc(db, "stocks", currentStockId);
+
+            // Update stock quantity and check if it reaches 0
             await updateDoc(stockDoc, {
                 productID: selectedProduct.value,
                 productName: selectedProduct.label,
@@ -89,6 +91,13 @@ const Stocks = () => {
                 expiryDate: expiryDate || null,
                 dateAdded, // Keep existing dateAdded or set the current date for updates
             });
+
+            // Check if quantity is 0 and delete stock
+            if (parseInt(quantity) === 0) {
+                await deleteDoc(stockDoc);
+                alert("Stock quantity reached 0 and has been deleted.");
+            }
+
             fetchStocks();
             setIsModalOpen(false);
             resetFormFields();
@@ -116,7 +125,7 @@ const Stocks = () => {
     const openEditModal = (stock) => {
         setSelectedProduct({
             value: stock.productID,
-            label: `[ ${stock.productID} ] [ ${stock.productName} ]`,
+            label: `${stock.productName}`,
         });
         setQuantity(stock.quantity);
         setExpiryDate(stock.expiryDate || "");

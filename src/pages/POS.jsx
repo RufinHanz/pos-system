@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from "react";
-import { db, collection, getDocs, addDoc, updateDoc, doc } from "../database/firebase";
+import { db, collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "../database/firebase";
 import { FaCartPlus } from "react-icons/fa";
 import Sidebar from "../component/Sidebar";
 import "../pages/pagescss/POS.css";
@@ -52,7 +52,6 @@ const POS = () => {
     }, [products, stocks, searchTerm]);
 
     // Add to cart with quantity input
-    // Add to cart with quantity input
     const handleAddToCart = (product) => {
         const stock = stocks.find((stock) => stock.productID === product.productID);
         const maxQuantity = stock.quantity;
@@ -96,7 +95,6 @@ const POS = () => {
         }
     };
 
-
     // Remove item from cart
     const handleRemoveFromCart = (index) => {
         const updatedCart = [...cart];
@@ -123,7 +121,14 @@ const POS = () => {
         for (const item of cart) {
             const stock = stocks.find((stock) => stock.productID === item.productID);
             const updatedStockDoc = doc(db, "stocks", stock.id);
-            await updateDoc(updatedStockDoc, { quantity: stock.quantity - item.quantity });
+            const updatedQuantity = stock.quantity - item.quantity;
+
+            // If quantity reaches 0 or below, delete the stock entry
+            if (updatedQuantity <= 0) {
+                await deleteDoc(updatedStockDoc);
+            } else {
+                await updateDoc(updatedStockDoc, { quantity: updatedQuantity });
+            }
         }
 
         // Save transaction to database with product names
