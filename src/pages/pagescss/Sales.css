@@ -1,0 +1,49 @@
+/* Parent container for sidebar and content */
+.sales-container {
+    display: flex;
+    height: 100vh; /* Full height of the viewport */
+    overflow: hidden;
+}
+
+    /* Sidebar styling */
+    .sales-container > .sidebar {
+        width: 250px; /* Fixed width for the Sidebar */
+        flex-shrink: 0;
+    }
+
+/* Content styling */
+.sales-content {
+    flex: 1; /* Take the remaining space */
+    padding: 20px; /* Add padding around the content */
+    overflow-y: auto; /* Enable scrolling if content overflows */
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sales-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+    .sales-table th, .sales-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    .sales-table th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+
+    .sales-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .sales-table tr:hover {
+        background-color: #ddd;
+    }

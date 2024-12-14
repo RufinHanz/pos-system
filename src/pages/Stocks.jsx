@@ -12,7 +12,6 @@ const Stocks = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [quantity, setQuantity] = useState("");
     const [expiryDate, setExpiryDate] = useState("");
-    const [dateAdded, setDateAdded] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [editMode, setEditMode] = useState(false);
@@ -43,8 +42,8 @@ const Stocks = () => {
     };
 
     const addStock = async () => {
-        if (!selectedProduct || !quantity || !dateAdded) {
-            alert("Product, Quantity, and Date Added are required!");
+        if (!selectedProduct || !quantity) {
+            alert("Product and Quantity are required!");
             return;
         }
 
@@ -56,13 +55,15 @@ const Stocks = () => {
             return;
         }
 
+        const dateAdded = new Date().toISOString().split("T")[0]; // Automatically set the current date
+
         if (window.confirm("Do you want to add this stock?")) {
             await addDoc(collection(db, "stocks"), {
                 productID: selectedProduct.value,
                 productName: selectedProduct.label,
                 quantity: parseInt(quantity),
                 expiryDate: expiryDate || null,
-                dateAdded,
+                dateAdded, // Add current date automatically
             });
             fetchStocks();
             setIsModalOpen(false);
@@ -72,10 +73,12 @@ const Stocks = () => {
     };
 
     const editStock = async () => {
-        if (!selectedProduct || !quantity || !dateAdded) {
-            alert("Product, Quantity, and Date Added are required!");
+        if (!selectedProduct || !quantity) {
+            alert("Product and Quantity are required!");
             return;
         }
+
+        const dateAdded = new Date().toISOString().split("T")[0]; // If editing, we can keep the existing dateAdded from DB
 
         if (window.confirm("Do you want to save changes to this stock?")) {
             const stockDoc = doc(db, "stocks", currentStockId);
@@ -84,7 +87,7 @@ const Stocks = () => {
                 productName: selectedProduct.label,
                 quantity: parseInt(quantity),
                 expiryDate: expiryDate || null,
-                dateAdded,
+                dateAdded, // Keep existing dateAdded or set the current date for updates
             });
             fetchStocks();
             setIsModalOpen(false);
@@ -97,7 +100,6 @@ const Stocks = () => {
         setSelectedProduct(null);
         setQuantity("");
         setExpiryDate("");
-        setDateAdded("");
         setEditMode(false);
         setCurrentStockId("");
     };
@@ -118,7 +120,6 @@ const Stocks = () => {
         });
         setQuantity(stock.quantity);
         setExpiryDate(stock.expiryDate || "");
-        setDateAdded(stock.dateAdded);
         setCurrentStockId(stock.id);
         setEditMode(true);
         setIsModalOpen(true);
@@ -160,12 +161,6 @@ const Stocks = () => {
                     <div className="modal">
                         <div className="modal-content">
                             <h2>{editMode ? "Edit Stock" : "Add New Stock"}</h2>
-                            <label>Date Added</label>
-                            <input
-                                type="date"
-                                value={dateAdded}
-                                onChange={(e) => setDateAdded(e.target.value)}
-                            />
                             <label>Product</label>
                             <Select
                                 options={products.map((product) => ({
@@ -212,7 +207,7 @@ const Stocks = () => {
                         {filteredStocks.map((stock) => (
                             <tr key={stock.id}>
                                 <td>{stock.dateAdded}</td>
-                                <td>[ {stock.productID} ] [ {stock.productName} ]</td>
+                                <td>{stock.productName}</td>
                                 <td>{stock.quantity}</td>
                                 <td>{stock.expiryDate || "N/A"}</td>
                                 <td>

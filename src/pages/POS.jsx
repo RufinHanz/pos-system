@@ -11,8 +11,6 @@ const POS = () => {
     const [cart, setCart] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
-    const [isHistoryVisible, setIsHistoryVisible] = useState(false);
-    const [transactionHistory, setTransactionHistory] = useState([]);
 
     // Fetch products and stocks
     useEffect(() => {
@@ -54,24 +52,50 @@ const POS = () => {
     }, [products, stocks, searchTerm]);
 
     // Add to cart with quantity input
+    // Add to cart with quantity input
     const handleAddToCart = (product) => {
         const stock = stocks.find((stock) => stock.productID === product.productID);
         const maxQuantity = stock.quantity;
 
-        const quantity = parseInt(prompt(`Enter quantity (Max: ${maxQuantity}):`), 10);
-        if (isNaN(quantity) || quantity <= 0 || quantity > maxQuantity) {
-            alert("Invalid quantity entered!");
-            return;
+        // Check if product already exists in the cart
+        const existingProductIndex = cart.findIndex((item) => item.productID === product.productID);
+
+        if (existingProductIndex !== -1) {
+            // Product already in cart, ask user for new quantity and update
+            const existingProduct = cart[existingProductIndex];
+            const quantityToAdd = parseInt(prompt(`Enter quantity to add (Current quantity: ${existingProduct.quantity}, Max: ${maxQuantity}):`), 10);
+
+            if (isNaN(quantityToAdd) || quantityToAdd <= 0 || quantityToAdd + existingProduct.quantity > maxQuantity) {
+                alert("Invalid quantity entered!");
+                return;
+            }
+
+            // Update cart with new quantity
+            const updatedCart = [...cart];
+            updatedCart[existingProductIndex] = {
+                ...existingProduct,
+                quantity: existingProduct.quantity + quantityToAdd,
+                totalPrice: (existingProduct.quantity + quantityToAdd) * product.productPrice,
+            };
+            setCart(updatedCart);
+        } else {
+            // Product not in cart, add it
+            const quantity = parseInt(prompt(`Enter quantity (Max: ${maxQuantity}):`), 10);
+            if (isNaN(quantity) || quantity <= 0 || quantity > maxQuantity) {
+                alert("Invalid quantity entered!");
+                return;
+            }
+
+            const cartItem = {
+                ...product,
+                quantity,
+                totalPrice: quantity * product.productPrice,
+            };
+
+            setCart([...cart, cartItem]);
         }
-
-        const cartItem = {
-            ...product,
-            quantity,
-            totalPrice: quantity * product.productPrice,
-        };
-
-        setCart([...cart, cartItem]);
     };
+
 
     // Remove item from cart
     const handleRemoveFromCart = (index) => {
@@ -102,12 +126,20 @@ const POS = () => {
             await updateDoc(updatedStockDoc, { quantity: stock.quantity - item.quantity });
         }
 
-        // Save transaction to database
+        // Save transaction to database with product names
+        const productsInTransaction = cart.map(item => ({
+            productID: item.productID,
+            productName: item.productName,
+            quantity: item.quantity,
+            totalPrice: item.totalPrice
+        }));
+
         await addDoc(collection(db, "transactions"), {
             date: new Date().toISOString(),
             totalAmount,
             moneyPaid: money,
             change: money - totalAmount,
+            products: productsInTransaction // Save products with names in the transaction
         });
 
         alert("Transaction complete!");
@@ -115,20 +147,11 @@ const POS = () => {
         setIsCheckoutVisible(false); // Close the checkout modal
     };
 
-    // Fetch transaction history
-    const fetchTransactionHistory = async () => {
-        const transactionsCollection = collection(db, "transactions");
-        const transactionsSnapshot = await getDocs(transactionsCollection);
-        const history = transactionsSnapshot.docs.map((doc) => doc.data());
-        setTransactionHistory(history);
-        setIsHistoryVisible(true);
-    };
-
     return (
         <div className="app-container">
             <Sidebar />
             <div className="page-content">
-                <h1>Main POS</h1>
+                <h1>POS</h1>
 
                 <input
                     type="text"
@@ -140,9 +163,6 @@ const POS = () => {
 
                 <button onClick={() => setIsCheckoutVisible(true)} className="checkout-button">
                     Check Out
-                </button>
-                <button onClick={fetchTransactionHistory} className="history-button">
-                    History
                 </button>
 
                 <table>
@@ -159,7 +179,7 @@ const POS = () => {
                             <tr key={product.id}>
                                 <td>{product.productName}</td>
                                 <td>{product.productDescription}</td>
-                                <td>₱{product.productPrice}</td> {/* Change to Peso sign */}
+                                <td>₱{product.productPrice}</td>
                                 <td>
                                     <button onClick={() => handleAddToCart(product)} className="add-to-cart-button">
                                         <FaCartPlus />
@@ -180,35 +200,16 @@ const POS = () => {
                                     <div key={index} className="checkout-item">
                                         <span>{item.productName}</span>
                                         <span>Qty: {item.quantity}</span>
-                                        <span>₱{item.totalPrice}</span> {/* Change to Peso sign */}
+                                        <span>₱{item.totalPrice}</span>
                                         <button onClick={() => handleRemoveFromCart(index)} className="delete-button">Remove</button>
                                     </div>
                                 ))}
                             </div>
                             <div className="checkout-total">
                                 <strong>Total: </strong>
-                                ₱{cart.reduce((sum, item) => sum + item.totalPrice, 0)} {/* Change to Peso sign */}
+                                ₱{cart.reduce((sum, item) => sum + item.totalPrice, 0)}
                             </div>
                             <button onClick={handleCheckout} className="buy-button">Buy Products</button>
-                        </div>
-                    </div>
-                )}
-
-                {isHistoryVisible && (
-                    <div className="history-container">
-                        <div className="history-modal">
-                            <h2>Transaction History</h2>
-                            <button onClick={() => setIsHistoryVisible(false)} className="close-button">Close</button>
-                            <ul>
-                                {transactionHistory.map((transaction, index) => (
-                                    <li key={index}>
-                                        <p>Date: {new Date(transaction.date).toLocaleString()}</p>
-                                        <p>Total: ₱{transaction.totalAmount}</p> {/* Change to Peso sign */}
-                                        <p>Paid: ₱{transaction.moneyPaid}</p> {/* Change to Peso sign */}
-                                        <p>Change: ₱{transaction.change}</p> {/* Change to Peso sign */}
-                                    </li>
-                                ))}
-                            </ul>
                         </div>
                     </div>
                 )}
